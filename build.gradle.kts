@@ -1,6 +1,9 @@
 plugins {
+    id("maven")
     kotlin("jvm") version "1.3.61"
 }
+
+group = "com.github.jaeho"
 
 repositories {
     jcenter()
