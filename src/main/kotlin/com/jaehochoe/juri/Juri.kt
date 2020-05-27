@@ -3,6 +3,7 @@ package com.jaehochoe.juri
 import com.jaehochoe.juri.annotation.JuriField
 import com.jaehochoe.juri.annotation.JuriIgnore
 import com.jaehochoe.juri.annotation.JuriModel
+import com.jaehochoe.juri.annotation.JuriOnRestoreModel
 import java.lang.reflect.Field
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -16,21 +17,21 @@ object Juri {
         val clazz = model.javaClass
         clazz.getAnnotation(JuriModel::class.java)?.let {
             val fields = validFields(clazz).associateBy(
-                { field ->
-                    fieldName(field)
-                },
-                { field ->
-                    field.isAccessible = true
-                    field.get(model)
-                }
+                    { field ->
+                        fieldName(field)
+                    },
+                    { field ->
+                        field.isAccessible = true
+                        field.get(model)
+                    }
             ).toMutableMap()
             val fieldAttributes = validFields(clazz).associateBy(
-                { field ->
-                    fieldName(field)
-                },
-                { field ->
-                    uriField(field)
-                }
+                    { field ->
+                        fieldName(field)
+                    },
+                    { field ->
+                        uriField(field)
+                    }
             )
             val uri = StringBuilder(it.scheme.plus("://").plus(it.host))
             var closingBracketIndex = -1
@@ -100,21 +101,21 @@ object Juri {
                 throw Exception("Not matched scheme or host.")
 
             val fieldAttributes = validFields(clazz).associateBy(
-                { field ->
-                    fieldName(field)
-                },
-                { field ->
-                    uriField(field)
-                }
+                    { field ->
+                        fieldName(field)
+                    },
+                    { field ->
+                        uriField(field)
+                    }
             )
             val fields = mutableMapOf<String, String?>()
             val pathSegment = uri.substring(baseUri.length + 1).split("/")
             val pathFormat = uriModel.path.split("/")
             val startWithSlash = uriModel.path.startsWith("/")
             pathFormat.forEachIndexed { index, s ->
-                val i = index - if(startWithSlash) 1 else 0
+                val i = index - if (startWithSlash) 1 else 0
                 if (s.startsWith("{") && s.endsWith("}")) {
-                    val value = pathSegment[if(i >= pathSegment.size) pathSegment.size - 1 else i]
+                    val value = pathSegment[if (i >= pathSegment.size) pathSegment.size - 1 else i]
                     fields[s.substring(1, s.length - 1)] = if (value.contains("?", false)) value.substring(0, value.indexOfFirst { c -> c == '?' }) else value
                 }
             }
@@ -134,30 +135,30 @@ object Juri {
             } catch (e: Exception) {
                 val kClass = Reflection.createKotlinClass(clazz)
                 kClass.primaryConstructor?.parameters?.associateBy(
-                    { parameter ->
-                        parameter
-                    },
-                    { parameter ->
-                        val key = fieldMap[parameter.name] ?: parameter.name
-                        val isNeedUrlEncoding = fieldAttributes[key]?.isNeedUrlEncoding == true
-                        fields[key]?.let { value ->
-                            when (parameter.type.javaType) {
-                                Int::class.java -> value.toInt()
-                                Float::class.java -> value.toFloat()
-                                Double::class.java -> value.toDouble()
-                                Long::class.java -> value.toLong()
-                                Boolean::class.java -> value.toBoolean()
-                                Array<Int>::class.java -> value.split(",").map { entry -> entry.toInt() }.toTypedArray()
-                                Array<Float>::class.java -> value.split(",").map { entry -> entry.toFloat() }.toTypedArray()
-                                Array<Double>::class.java -> value.split(",").map { entry -> entry.toDouble() }.toTypedArray()
-                                Array<Long>::class.java -> value.split(",").map { entry -> entry.toLong() }.toTypedArray()
-                                Array<String>::class.java -> value.split(",").map { entry -> if(isNeedUrlEncoding) URLDecoder.decode(entry, "UTF-8") else entry }.toTypedArray()
-                                Array<Boolean>::class.java -> value.split(",").map { entry -> entry.toBoolean() }.toTypedArray()
-                                String::class.java -> if(isNeedUrlEncoding) URLDecoder.decode(value, "UTF-8") else value
-                                else -> null
+                        { parameter ->
+                            parameter
+                        },
+                        { parameter ->
+                            val key = fieldMap[parameter.name] ?: parameter.name
+                            val isNeedUrlEncoding = fieldAttributes[key]?.isNeedUrlEncoding == true
+                            fields[key]?.let { value ->
+                                when (parameter.type.javaType) {
+                                    Int::class.java -> value.toInt()
+                                    Float::class.java -> value.toFloat()
+                                    Double::class.java -> value.toDouble()
+                                    Long::class.java -> value.toLong()
+                                    Boolean::class.java -> value.toBoolean()
+                                    Array<Int>::class.java -> value.split(",").map { entry -> entry.toInt() }.toTypedArray()
+                                    Array<Float>::class.java -> value.split(",").map { entry -> entry.toFloat() }.toTypedArray()
+                                    Array<Double>::class.java -> value.split(",").map { entry -> entry.toDouble() }.toTypedArray()
+                                    Array<Long>::class.java -> value.split(",").map { entry -> entry.toLong() }.toTypedArray()
+                                    Array<String>::class.java -> value.split(",").map { entry -> if (isNeedUrlEncoding) URLDecoder.decode(entry, "UTF-8") else entry }.toTypedArray()
+                                    Array<Boolean>::class.java -> value.split(",").map { entry -> entry.toBoolean() }.toTypedArray()
+                                    String::class.java -> if (isNeedUrlEncoding) URLDecoder.decode(value, "UTF-8") else value
+                                    else -> null
+                                }
                             }
                         }
-                    }
                 )?.let { map ->
                     kClass.primaryConstructor?.callBy(map) as? T
                 }
@@ -178,20 +179,23 @@ object Juri {
                         Array<Float>::class.java -> field.set(model, value.split(",").map { entry -> entry.toFloat() }.toTypedArray())
                         Array<Double>::class.java -> field.set(model, value.split(",").map { entry -> entry.toDouble() }.toTypedArray())
                         Array<Long>::class.java -> field.set(model, value.split(",").map { entry -> entry.toLong() }.toTypedArray())
-                        Array<String>::class.java -> field.set(model, value.split(",").map { entry -> if(isNeedUrlEncoding) URLDecoder.decode(entry, "UTF-8") else entry }.toTypedArray())
+                        Array<String>::class.java -> field.set(model, value.split(",").map { entry -> if (isNeedUrlEncoding) URLDecoder.decode(entry, "UTF-8") else entry }.toTypedArray())
                         Array<Boolean>::class.java -> field.set(model, value.split(",").map { entry -> entry.toBoolean() }.toTypedArray())
-                        String::class.java -> field.set(model, if(isNeedUrlEncoding) URLDecoder.decode(value, "UTF-8") else value)
+                        String::class.java -> field.set(model, if (isNeedUrlEncoding) URLDecoder.decode(value, "UTF-8") else value)
                     }
                 }
             }
 
-            try {
-                clazz.getDeclaredMethod("onRestoreJuriModel", clazz)
-            } catch (e: Exception) {
-                null
-            }?.let { method ->
-                model?.let {
-                    method.invoke(it, it)
+            model?.let {
+                try {
+                    clazz.declaredMethods.find {
+                        it.getAnnotation(JuriOnRestoreModel::class.java) != null
+                    }?.let { method ->
+                        method.invoke(model)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
                 }
             }
 
@@ -200,14 +204,14 @@ object Juri {
         throw Exception("Required @JuriModel annotation.")
     }
 
-    fun <T> values(uri: String, clazz: Class<T>) : Map<String, Any> {
+    fun <T> values(uri: String, clazz: Class<T>): Map<String, Any> {
         val value = fromUri(uri, clazz)
         return mutableMapOf<String, Any>().apply {
             validFields(clazz).forEach { field ->
                 field.isAccessible = true
                 val key = if (field.isAnnotationPresent(JuriField::class.java)) field.getAnnotation(JuriField::class.java).key else field.name
                 val isNeedUrlEncoding = field.isAnnotationPresent(JuriField::class.java) && field.getAnnotation(JuriField::class.java).isNeedUrlEncoding
-                put(key, if(isNeedUrlEncoding) URLEncoder.encode(field.get(value).toString(), "UTF-8") else field.get(value))
+                put(key, if (isNeedUrlEncoding) URLEncoder.encode(field.get(value).toString(), "UTF-8") else field.get(value))
             }
         }
     }
@@ -223,7 +227,7 @@ object Juri {
     private fun fieldName(field: Field): String {
         return when (val uriField = uriField(field)) {
             null -> field.name
-            else -> if(uriField.key.isNullOrBlank()) field.name else uriField.key
+            else -> if (uriField.key.isNullOrBlank()) field.name else uriField.key
         }
     }
 
@@ -236,18 +240,18 @@ object Juri {
 
     private fun <T> fieldMap(clazz: Class<T>): Map<String, String?> {
         return validFields(clazz).associateBy(
-            { it.name },
-            { field ->
-                when {
-                    field.isAnnotationPresent(JuriField::class.java) -> {
-                        when (field.getAnnotation(JuriField::class.java).key) {
-                            "" -> null
-                            else -> field.getAnnotation(JuriField::class.java).key
+                { it.name },
+                { field ->
+                    when {
+                        field.isAnnotationPresent(JuriField::class.java) -> {
+                            when (field.getAnnotation(JuriField::class.java).key) {
+                                "" -> null
+                                else -> field.getAnnotation(JuriField::class.java).key
+                            }
                         }
+                        else -> null
                     }
-                    else -> null
                 }
-            }
         )
     }
 
