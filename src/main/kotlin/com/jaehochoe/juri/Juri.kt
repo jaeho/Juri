@@ -110,9 +110,11 @@ object Juri {
             val fields = mutableMapOf<String, String?>()
             val pathSegment = uri.substring(baseUri.length + 1).split("/")
             val pathFormat = uriModel.path.split("/")
+            val startWithSlash = uriModel.path.startsWith("/")
             pathFormat.forEachIndexed { index, s ->
+                val i = index - if(startWithSlash) 1 else 0
                 if (s.startsWith("{") && s.endsWith("}")) {
-                    val value = pathSegment[index]
+                    val value = pathSegment[if(i >= pathSegment.size) pathSegment.size - 1 else i]
                     fields[s.substring(1, s.length - 1)] = if (value.contains("?", false)) value.substring(0, value.indexOfFirst { c -> c == '?' }) else value
                 }
             }
