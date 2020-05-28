@@ -1,6 +1,6 @@
 # JUri
 
-JUri is Java/kotlin library that can be used to convert Java/Kotlin Object into their URI representation. It can also be used to convert a URI string to an equivalent Java/Kotlin object. JUri can work with arbitrary Java objects including pre-existing objects that you added a little annotations. 
+JUri is Java/kotlin library that can be used to convert Java/Kotlin Object into their URI representation. It can also be used to convert a URI string to an equivalent Java/Kotlin object. JUri can work with arbitrary pre-existing objects that you added a little annotations. 
 
 Juri's basic concept and some method name has inspired from Google Gson.
 
