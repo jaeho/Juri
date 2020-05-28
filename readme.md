@@ -56,7 +56,7 @@ Juri.fromUri("myapp://search/book/p/1?query=paris&sort=price:desc", SearchOption
 // It will be SearchOptions("paris", "price:desc", "book", 1)
 ```
 
-If you want to mark exceptive field, you can using `@JuriIgonre` and also you wanto mark alternative field, you should add `@JuriField`. Sometimes when you needs modeling your field on `fromUri()` you should added function with annotation `@JuriOnRestoreModel`.
+If you want to mark exceptive field, you can using `@JuriIgonre` and also you wanto mark alternative field, you should add `@JuriField`. Sometimes when you needs modeling your field on `fromUri()` you should added function with annotation `@JuriOnRestoreModel`. If you need more information, check this [test-code](src/test/kotlin/com/jaehochoe/juri/JuriTest.kt).
 
 ### Licencse
 
