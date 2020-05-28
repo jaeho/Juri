@@ -30,19 +30,30 @@ dependencies {
 
 Simple Use cases will look something like this:
 
+First, you declare uri model class using `@JuriModel` annotation. 
+
 ```kotlin
-@JuriModel(scheme = "myapp", host = "search")
+@JuriModel(scheme = "myapp", host = "search", path = "/{category}/p/{page}")
 data class SearchOptions(
-    val query: String,
-    val sort: String?,
-    val page: Int
+        val query: String,
+        val sort: String?,
+        val category: String?,
+        val page: Int
 )
+```
 
-val model = SearchOptions("paris", "price:desc", 1)
-println(Juri.toUri(model)) // result is myapp://search?query=paris&sort=price:desc&page=1
+If you want Uri model convert to string, look below.
 
-val model = Juri.fromUri("myapp://search?query=paris&sort=price:desc&page=1", SearchOptions::class.java)
-println(model) // result is SearchOptions(query=paris, sort=price:desc, page=1)        
+```kotlin
+Juri.toUri(SearchOptions("paris", "price:desc", "book", 1)
+// It will be "myapp://search/book/p/1?query=paris&sort=price:desc"
+```
+
+Or vice-versa can possible.
+
+```kotlin
+Juri.fromUri("myapp://search/book/p/1?query=paris&sort=price:desc", SearchOptions::class.java)
+// It will be SearchOptions("paris", "price:desc", "book", 1)
 ```
 
 
